@@ -1,0 +1,26 @@
+notes/
+context.md
+report.md
+sunum.md
+
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Outputs (keep folder via .gitkeep, ignore generated artifacts except EDA figures)
+outputs/*
+!outputs/.gitkeep
+!outputs/eda/
+!outputs/eda/**
+
+# IDE
+.vscode/
+.idea/
