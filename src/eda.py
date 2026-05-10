@@ -1,5 +1,3 @@
-"""Exploratory data analysis: distributions, correlations, target balance."""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -11,10 +9,6 @@ import seaborn as sns
 from src.preprocess import CATEGORICAL, NUMERIC, PASSTHROUGH, TARGET, load_raw
 
 
-# === Çıktı klasörü ve grafik teması ===
-# Tüm figürler outputs/eda/ altına kaydedilir; bu klasör .gitignore'da
-# whitelist edildi, yani figürler raporla birlikte versiyonlanır.
-# Set2 paleti pastel ama yeterince ayrıştırıcı renkler verir.
 OUTPUT_DIR = Path("outputs/eda")
 
 sns.set_theme(style="whitegrid", palette="Set2")
@@ -25,9 +19,6 @@ def ensure_output_dir() -> None:
 
 
 def plot_target_balance(df: pd.DataFrame) -> Path:
-    # === Hedef sınıf dağılımı (Slayt 2'de kullanılan figür) ===
-    # 160 negatif vs 137 pozitif — hafif dengesizlik var ama ciddi sorun değil.
-    # Bu yüzden class_weight veya SMOTE gibi tekniklere ihtiyaç duymadık.
     counts = df[TARGET].value_counts().sort_index()
     fig, ax = plt.subplots(figsize=(5, 4))
     sns.barplot(x=counts.index.astype(str), y=counts.values, ax=ax,
@@ -45,10 +36,6 @@ def plot_target_balance(df: pd.DataFrame) -> Path:
 
 
 def plot_numerical_distributions(df: pd.DataFrame) -> Path:
-    # === Sayısal özelliklerin sınıfa göre KDE'si ===
-    # Her sayısal özellik için iki sınıfın yoğunluk eğrisini üst üste çiziyoruz.
-    # Sunumda en çok dikkat çeken: thalach (hastalarda max kalp atışı belirgin
-    # şekilde düşük) ve oldpeak (pozitif sınıfın sağ kuyruğu uzun).
     fig, axes = plt.subplots(2, 3, figsize=(14, 8))
     axes = axes.flatten()
     for ax, feat in zip(axes, NUMERIC):
@@ -57,7 +44,6 @@ def plot_numerical_distributions(df: pd.DataFrame) -> Path:
                         fill=True, alpha=0.35, linewidth=1.5)
         ax.set_title(feat)
         ax.legend()
-    # 5 sayısal özellik var, 6 alt grafiğin sonuncusu boş kalır
     for j in range(len(NUMERIC), len(axes)):
         axes[j].set_visible(False)
     fig.suptitle("Sayısal özelliklerin sınıfa göre dağılımı", fontsize=14)
@@ -69,10 +55,6 @@ def plot_numerical_distributions(df: pd.DataFrame) -> Path:
 
 
 def plot_categorical_distributions(df: pd.DataFrame) -> Path:
-    # === Kategorik ve ikili özelliklerin sınıfa göre count plot'u ===
-    # 8 alt grafik (4 kategorik + 4 ikili/tamsayı). En güçlü ayırıcılar:
-    # thal=2 ve ca>=1 pozitif sınıfa, thal=0 ve ca=0 negatif sınıfa yığılıyor.
-    # fbs neredeyse hiç ayrım göstermiyor — bilgi taşımayan sütun.
     feats = CATEGORICAL + PASSTHROUGH
     fig, axes = plt.subplots(2, 4, figsize=(16, 8))
     axes = axes.flatten()
@@ -89,10 +71,6 @@ def plot_categorical_distributions(df: pd.DataFrame) -> Path:
 
 
 def plot_correlation_heatmap(df: pd.DataFrame) -> Path:
-    # === Pearson korelasyon ısı haritası ===
-    # Bu grafik sunumun en önemli görsellerinden biri: hedefle en yüksek
-    # korelasyon thal'da (0.52). Ayrıca özellikler arası korelasyonların
-    # zayıf olması (|r|<0.5) çoklu eş-doğrusallık olmadığını gösteriyor.
     corr = df.corr()
     fig, ax = plt.subplots(figsize=(11, 9))
     sns.heatmap(corr, annot=True, fmt=".2f", cmap="RdBu_r", center=0,
@@ -106,10 +84,6 @@ def plot_correlation_heatmap(df: pd.DataFrame) -> Path:
 
 
 def print_summary(df: pd.DataFrame) -> None:
-    # === Konsol özeti — figürlere ek olarak metin tabanlı rapor ===
-    # Şekil, eksik değer durumu, hedef dağılımı, sayısal istatistikler ve
-    # hedefle en yüksek korelasyona sahip 8 özelliğin listesini yazdırır.
-    # Sunum sırasında main.py çıktısında bu blok ilk akan kısımdır.
     print("=== Şekil ===")
     print(df.shape)
 
@@ -131,9 +105,6 @@ def print_summary(df: pd.DataFrame) -> None:
 
 
 def run() -> list[Path]:
-    # === EDA pipeline'ının orkestrasyonu ===
-    # main.py "STAGE 1: Exploratory Data Analysis" aşamasında bu fonksiyonu
-    # çağırır. Önce konsol özeti, sonra 4 figür kaydedilir.
     ensure_output_dir()
     df = load_raw()
     print_summary(df)
@@ -149,7 +120,5 @@ def run() -> list[Path]:
     return paths
 
 
-# === Bağımsız çalıştırma desteği ===
-# `python -m src.eda` ile sadece EDA aşamasını ayrı çalıştırabilirsiniz.
 if __name__ == "__main__":
     run()
