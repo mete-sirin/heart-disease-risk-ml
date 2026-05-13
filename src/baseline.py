@@ -7,19 +7,6 @@ from src.preprocess import RANDOM_STATE, get_splits
 
 
 def train_baseline(X_train, y_train) -> LogisticRegression:
-    # ============================================================
-    # LOJİSTİK REGRESYON — Referans (baseline) modeli
-    # ------------------------------------------------------------
-    # ANN'in gerçekten "ek değer" üretip üretmediğini ölçmek için bir
-    # referansa ihtiyacımız var. Lojistik regresyon hızlı, yorumlanabilir
-    # ve doğrusal sınırlar çizen klasik bir sınıflayıcı. Eğer veri doğrusal
-    # ayrılabilirse zaten yüksek skor verir — ki bizim verimiz öyle.
-    #
-    # max_iter=1000: küçük ve dengeli verimizde varsayılan 100 iter zaman
-    # zaman convergence uyarısı veriyor; 1000'e çıkarıp güvenceye aldık.
-    # Hyperparameter taraması YAPILMADI; bu özellikle bilinçli bir karar:
-    # baseline'ın tuning'siz değerini görmek istedik.
-    # ============================================================
     model = LogisticRegression(max_iter=1000, random_state=RANDOM_STATE)
     model.fit(X_train, y_train)
     return model

@@ -25,23 +25,6 @@ DECISION_THRESHOLD = 0.5
 
 
 def build_model(n_features: int, hidden_units=(16, 8), dropout: float = DROPOUT) -> Sequential:
-    # ============================================================
-    # YAPAY SİNİR AĞI — Parametrik mimari kurucusu
-    # ------------------------------------------------------------
-    # hidden_units bir tuple; içinde kaç eleman varsa o kadar gizli katman
-    # oluşur. Bu sayede aynı fonksiyondan hem v1 (16, 8) hem v2 (8,)
-    # mimarisini kurabiliyoruz — kod tekrarı yok.
-    #
-    # Her gizli katmanda:
-    #   - Dense(units, relu) : doğrusal olmayan dönüşüm
-    #   - Dropout(0.3)       : rastgele nöron kapatma → overfitting engeli
-    # Son katman: tek nöron + sigmoid → [0, 1] olasılığı.
-    #
-    # Derleme:
-    #   - Loss  : binary_crossentropy (ikili sınıflandırmanın standardı)
-    #   - Metrik: accuracy + recall; recall'ı validation'da da takip ediyoruz
-    #             çünkü sağlık probleminde asıl öncelik FN'i azaltmak.
-    # ============================================================
     layers = [Input(shape=(n_features,))]
     for units in hidden_units:
         layers.append(Dense(units, activation="relu"))
@@ -59,19 +42,6 @@ def build_model(n_features: int, hidden_units=(16, 8), dropout: float = DROPOUT)
 
 
 def train_model(model, X_train, y_train, *, verbose=0):
-    # ============================================================
-    # ANN EĞİTİMİ — Stratifiye validation + EarlyStopping
-    # ------------------------------------------------------------
-    # Keras'ın validation_split parametresi train verisinin SON %20'sini
-    # alır ve bunu STRATİFİYE ETMEZ. Küçük veri setimizde bu sınıf oranını
-    # bozabilir. O yüzden train_test_split'i elle çağırıp stratify=y_train
-    # ile sınıf dağılımını koruyarak validation setini ayırıyoruz.
-    #
-    # EarlyStopping:
-    #   - monitor="val_loss" : validation kaybı izlenir
-    #   - patience=20        : 20 epoch boyunca iyileşme olmazsa eğitimi kes
-    #   - restore_best_weights=True : durulduğunda en iyi ağırlıklara dön
-    # ============================================================
     X_tr, X_val, y_tr, y_val = train_test_split(
         X_train,
         y_train,
